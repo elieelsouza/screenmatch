@@ -19,11 +19,70 @@ public class Principal {
     private static final ConsumoAPI consumoAPI = new ConsumoAPI();
     private static final ConverteDados conversor = new ConverteDados();
 
-    public void exibeMenu(){
+    public void exibeMenu() {
+        var menu = """
+                1 - Buscar series
+                2 - Buscar episodios
+                
+                0 - Sair
+                """;
+
+        System.out.println(menu);
+        var opcao = sc.nextInt();
+        sc.nextLine();
+        
+        switch (opcao){
+            case 1:
+                buscarSerieWeb();
+                break;
+            case 2:
+                buscarEpisodioPorSerie();
+                break;
+            case 0:
+                System.out.println("Saindo...");
+                break;
+            default:
+                System.out.println("Opacao invalida");
+        }
+
+    }
+
+    private void buscarEpisodioPorSerie() {
+        DadosSerie dadosSerie = getDadosSerie();
+        List<DadosTemporada> temporadas = new ArrayList<>();
+
+        for (int i = 1; i <= dadosSerie.totalTemporadas(); i++) {
+            var json = consumoAPI.obterDados(DOMINIO + dadosSerie.titulo().replace(" ", "+") + "&season=" + i + API_KEY);
+            DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
+            temporadas.add(dadosTemporada);
+        }
+        temporadas.forEach(System.out::println);
+    }
+
+    private void buscarSerieWeb() {
+        DadosSerie dados = getDadosSerie();
+        System.out.println(dados);
+    }
+
+    private DadosSerie getDadosSerie() {
+        System.out.println("Digite o nome da serie para busca: ");
+        var nomeSerie = sc.nextLine();
+        var json = consumoAPI.obterDados(DOMINIO + nomeSerie.replace(" ", "+") + API_KEY);
+        DadosSerie serie = conversor.obterDados(json, DadosSerie.class);
+        return serie;
+    }
+
+    /**
+     * Este metodo tem como objetivo um conteudo didatico, para treinamento de conhecimento em stream de dados e funcoes lambdas
+     *
+     * Curso Alura: Java: Trabalhando com lambdas, stream e Spring Framework
+     */
+    public void exibeMenuStream(){
 
         System.out.println("Digite o nome de uma serie: ");
         var nmSerie = sc.nextLine();
-        var json = consumoAPI.obterDados(DOMINIO + nmSerie.replaceAll(" ", "+") + API_KEY);
+        var json = consumoAPI.obterDados(DOMINIO + nmSerie.replace(" ", "+") + API_KEY);
+        System.out.println("Json depois da requisicao: "+json);
         DadosSerie serie = conversor.obterDados(json, DadosSerie.class);
         System.out.println(serie.toString());
 
@@ -45,14 +104,14 @@ public class Principal {
 //        temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.tituloEpisodio())) );
 
 
-//        List<String> nomess = Arrays.asList("Lilica", "Eliel", "Thaina", "Theo", "Elisa", "Valdeni", "Nanci");
-//
-//        nomess.stream()
-//                .sorted()
-//                .limit(4)
-//                .filter(n -> n.startsWith("E"))
-//                .map(String::toUpperCase)
-//                .forEach(System.out::println);
+        List<String> nomess = Arrays.asList("Lilica", "Eliel", "Thaina", "Theo", "Elisa", "Valdeni", "Nanci");
+
+        nomess.stream()
+                .sorted()
+                .limit(4)
+                .filter(n -> n.startsWith("E"))
+                .map(String::toUpperCase)
+                .forEach(System.out::println);
         List<DadosEpisodio> dadosEpisodios = temporadas.stream()
                 .flatMap(t -> t.episodios().stream())
                 .collect(Collectors.toList()); // tambem funciona adicionando somente o toList(), porem a lista se torna imutavel
@@ -121,5 +180,6 @@ public class Principal {
         System.out.println("Pior Episodio: " + est.getMin());
         System.out.println("Quantidade de episodios: " + est.getCount());
     }
+
 
 }
