@@ -18,33 +18,45 @@ public class Principal {
     private static final String API_KEY = "&apikey=f6818b3c";
     private static final ConsumoAPI consumoAPI = new ConsumoAPI();
     private static final ConverteDados conversor = new ConverteDados();
+    private List<DadosSerie> dadosSeries = new ArrayList<>();
 
     public void exibeMenu() {
-        var menu = """
+        var opcao = -1;
+        while(opcao != 0) {
+            var menu = """
                 1 - Buscar series
                 2 - Buscar episodios
+                3 - Listar series buscadas
                 
                 0 - Sair
                 """;
 
-        System.out.println(menu);
-        var opcao = sc.nextInt();
-        sc.nextLine();
-        
-        switch (opcao){
-            case 1:
-                buscarSerieWeb();
-                break;
-            case 2:
-                buscarEpisodioPorSerie();
-                break;
-            case 0:
-                System.out.println("Saindo...");
-                break;
-            default:
-                System.out.println("Opacao invalida");
-        }
+            System.out.println(menu);
+            opcao = sc.hasNextInt() ? sc.nextInt() : -1;
+            sc.nextLine();
 
+            switch (opcao){
+                case 1:
+                    buscarSerieWeb();
+                    break;
+                case 2:
+                    buscarEpisodioPorSerie();
+                    break;
+                case 3:
+                    listarSeriesBuscadas();
+                    break;
+                case 0:
+                    System.out.println("Saindo...");
+                    break;
+                default:
+                    System.out.println("Opacao invalida");
+                    break;
+            }
+        }
+    }
+
+    private void listarSeriesBuscadas() {
+        dadosSeries.forEach(System.out::println);
     }
 
     private void buscarEpisodioPorSerie() {
@@ -61,7 +73,7 @@ public class Principal {
 
     private void buscarSerieWeb() {
         DadosSerie dados = getDadosSerie();
-        System.out.println(dados);
+        dadosSeries.add(dados);
     }
 
     private DadosSerie getDadosSerie() {
