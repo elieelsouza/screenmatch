@@ -2,9 +2,11 @@ package br.com.alura.screenmatch.service;
 
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.service.OpenAiService;
+import space.dynomake.libretranslate.Language;
+import space.dynomake.libretranslate.Translator;
 
-public class ConsultaChatGPT {
-    public static String obterTraducao(String texto){
+public class ConsumoTradutor {
+    public static String obterTraducaoChatGPT(String texto){
         OpenAiService service = new OpenAiService("yourApiKeys");
 
         CompletionRequest request =  CompletionRequest.builder()
@@ -16,5 +18,9 @@ public class ConsultaChatGPT {
 
         var response = service.createCompletion(request);
         return response.getChoices().get(0).getText();
+    }
+
+    public static String obterTraducaoNativa(String texto){
+        return Translator.translate(Language.ENGLISH, Language.PORTUGUESE, texto);
     }
 }
